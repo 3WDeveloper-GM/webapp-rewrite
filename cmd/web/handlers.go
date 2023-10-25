@@ -16,7 +16,7 @@ import (
 func Home(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
-			http.NotFound(w, r)
+			app.NotFound(w)
 			return
 		}
 
@@ -24,19 +24,22 @@ func Home(app *config.Application) http.HandlerFunc {
 			"./ui/html/base.tmpl",
 			"./ui/html/partials/nav.tmpl",
 			"./ui/html/pages/home.tmpl",
+			//"./ui/html/pages/home.bak",
 		}
 
 		ts, err := template.ParseFiles(files...)
 		if err != nil {
 			app.Errorlog.Println(err.Error())
-			http.Error(w, "Internal Server error", http.StatusInternalServerError)
+			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
+			app.ServerError(w, err)
 			return
 		}
 
 		err = ts.ExecuteTemplate(w, "base", nil)
 		if err != nil {
 			app.Errorlog.Println(err.Error())
-			http.Error(w, "Internal Server error", http.StatusInternalServerError)
+			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
+			app.ServerError(w, err)
 			return
 		}
 	}
@@ -61,7 +64,8 @@ func Wcreate(app *config.Application) http.HandlerFunc {
 		if r.Method != http.MethodPost {
 
 			w.Header().Set("Allow", http.MethodPost)
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			app.ClientError(w, http.StatusMethodNotAllowed)
+			//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
