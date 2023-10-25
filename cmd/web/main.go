@@ -4,6 +4,8 @@ import (
 	"flag"
 	"net/http"
 	"time"
+
+	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
 )
 
 func main() {
@@ -11,14 +13,9 @@ func main() {
 	addr := flag.String("addr", ":9090", "http network address: A number that defines the addr of our application")
 	flag.Parse()
 
-	inflog := Infolog()
-	errlog := ErrorLog()
+	app := config.ExportLoggers()
 
-	app := GetApp()
-	app.ErrorLog = errlog
-	app.InfoLog = inflog
-
-	app.InfoLog.Printf("Starting application on port %v \n", *addr)
+	app.Infolog.Printf("Starting application on port %v \n", *addr)
 
 	//err := http.ListenAndServe(addr, Router())
 	//if err != nil {
@@ -27,9 +24,9 @@ func main() {
 	srv := &http.Server{
 		Handler:      Router(),
 		Addr:         *addr,
-		ErrorLog:     errlog,
+		ErrorLog:     app.Errorlog,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
-	app.ErrorLog.Fatal(srv.ListenAndServe())
+	app.Errorlog.Fatal(srv.ListenAndServe())
 }
