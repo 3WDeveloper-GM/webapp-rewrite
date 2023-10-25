@@ -24,7 +24,6 @@ func Home(app *config.Application) http.HandlerFunc {
 			"./ui/html/base.tmpl",
 			"./ui/html/partials/nav.tmpl",
 			"./ui/html/pages/home.tmpl",
-			//"./ui/html/pages/home.bak",
 		}
 
 		ts, err := template.ParseFiles(files...)

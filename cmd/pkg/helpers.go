@@ -1,3 +1,6 @@
+//This file is the helpers component of the config package. I'll code the most common error prompts
+//that will arise when dealing with errors in the web application.
+
 package config
 
 import (
