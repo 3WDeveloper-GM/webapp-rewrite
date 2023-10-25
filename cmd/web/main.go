@@ -11,9 +11,17 @@ import (
 func main() {
 
 	addr := flag.String("addr", ":9090", "http network address: A number that defines the addr of our application")
+	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL dsn")
 	flag.Parse()
 
 	app := config.ExportLoggers()
+
+	db, err := OpenDB(*dsn)
+	if err != nil {
+		app.Errorlog.Fatal(err)
+	}
+
+	defer db.Close()
 
 	app.Infolog.Printf("Starting application on port %v \n", *addr)
 
