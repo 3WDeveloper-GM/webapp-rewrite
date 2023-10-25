@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
+	loggers "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
 )
 
 type Application struct {
