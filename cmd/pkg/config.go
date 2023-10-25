@@ -6,24 +6,24 @@ import (
 	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
 )
 
-type application struct {
+type Application struct {
 	Infolog  *log.Logger
 	Errorlog *log.Logger
 }
 
-func GetApp() *application {
-	return &application{}
+func GetApp() *Application {
+	return &Application{}
 }
 
-func (app *application) defineErrorLog() {
+func (app *Application) defineErrorLog() {
 	app.Errorlog = loggers.ErrorLog()
 }
 
-func (app *application) defineInfoLog() {
+func (app *Application) defineInfoLog() {
 	app.Infolog = loggers.Infolog()
 }
 
-func ExportLoggers() *application {
+func ExportLoggers() *Application {
 	app := GetApp()
 	app.defineErrorLog()
 	app.defineInfoLog()
