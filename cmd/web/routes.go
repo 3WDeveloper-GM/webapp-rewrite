@@ -14,8 +14,10 @@ func Router() *mux.Router {
 
 	fileserver := http.FileServer(http.Dir("./ui/static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver))
-	r.HandleFunc("/", Home)
-	r.HandleFunc("/View", View)
-	r.HandleFunc("/WCreate", WCreate)
+
+	app := GetApp()
+	r.HandleFunc("/", app.Home)
+	r.HandleFunc("/View", app.View)
+	r.HandleFunc("/WCreate", app.WCreate)
 	return r
 }

@@ -11,10 +11,14 @@ func main() {
 	addr := flag.String("addr", ":9090", "http network address: A number that defines the addr of our application")
 	flag.Parse()
 
-	errorlog := ErrorLog()
-	infolog := Infolog()
+	inflog := Infolog()
+	errlog := ErrorLog()
 
-	infolog.Printf("Starting application on port %v \n", *addr)
+	app := GetApp()
+	app.ErrorLog = errlog
+	app.InfoLog = inflog
+
+	app.InfoLog.Printf("Starting application on port %v \n", *addr)
 
 	//err := http.ListenAndServe(addr, Router())
 	//if err != nil {
@@ -23,9 +27,9 @@ func main() {
 	srv := &http.Server{
 		Handler:      Router(),
 		Addr:         *addr,
-		ErrorLog:     errorlog,
+		ErrorLog:     errlog,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
-	errorlog.Fatal(srv.ListenAndServe())
+	app.ErrorLog.Fatal(srv.ListenAndServe())
 }
