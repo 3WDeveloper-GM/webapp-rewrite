@@ -68,6 +68,23 @@ func Wcreate(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		w.Write([]byte("Writing something on the WCreate page"))
+		title := "O snail"
+		content :=
+			`
+		O snail
+		Climb Mount Fuji
+		Slowly, but SLowly!
+
+		- Kobayashi Issa
+		`
+		expires := 7
+
+		id, err := app.Snippets.Insert(title, content, expires)
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("/Snippet/View?id=%d", id), http.StatusSeeOther)
 	}
 }

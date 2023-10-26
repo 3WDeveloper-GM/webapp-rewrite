@@ -18,7 +18,7 @@ func Router() *mux.Router {
 
 	app := config.GetApp()
 	r.HandleFunc("/", Home(app))
-	r.HandleFunc("/View", View(app))
-	r.HandleFunc("/WCreate", Wcreate(app))
+	r.HandleFunc("/snippet/view", View(app))
+	r.HandleFunc("/snippet/create", Wcreate(app))
 	return r
 }
