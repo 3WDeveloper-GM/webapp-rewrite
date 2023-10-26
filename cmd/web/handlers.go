@@ -79,7 +79,7 @@ func View(app *config.Application) http.HandlerFunc {
 		files := []string{
 			"./ui/html/base.tmpl",
 			"./ui/html/partials/nav.tmpl",
-			"./ui/html/pages/home.tmpl",
+			"./ui/html/pages/view.tmpl",
 		}
 
 		ts, err := template.ParseFiles(files...)
@@ -88,7 +88,11 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		err = ts.ExecuteTemplate(w, "base", snippet)
+		data := &TemplateData{
+			Snippet: snippet,
+		}
+
+		err = ts.ExecuteTemplate(w, "base", data)
 		if err != nil {
 			app.ServerError(w, err)
 		}
