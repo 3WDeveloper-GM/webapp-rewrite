@@ -3,12 +3,14 @@ package main
 // This file stores the things that are performed on the web page
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
+	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 
 // this is handler for the home page, this just checks that the page relates to the "/"
@@ -49,12 +51,20 @@ func View(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil || id < 1 {
-			http.NotFound(w, r)
+			app.NotFound(w)
 			return
 		}
-		fmt.Fprintln(w, "We are writing on a view page")
-		fmt.Fprintf(w, "We are viewing the snippet with the id: %v", id)
 
+		snippet, err := app.Snippets.Get(id)
+		if err != nil {
+			if errors.Is(err, models.ErrNoRecord) {
+				app.NotFound(w)
+			} else {
+				app.ServerError(w, err)
+			}
+		}
+
+		fmt.Fprintf(w, "%+v", snippet)
 	}
 }
 
