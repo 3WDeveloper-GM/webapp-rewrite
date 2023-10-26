@@ -5,7 +5,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -22,27 +21,37 @@ func Home(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		files := []string{
-			"./ui/html/base.tmpl",
-			"./ui/html/partials/nav.tmpl",
-			"./ui/html/pages/home.tmpl",
-		}
-
-		ts, err := template.ParseFiles(files...)
+		snippets, err := app.Snippets.Latest()
 		if err != nil {
-			app.Errorlog.Println(err.Error())
-			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
 			app.ServerError(w, err)
 			return
 		}
 
-		err = ts.ExecuteTemplate(w, "base", nil)
-		if err != nil {
-			app.Errorlog.Println(err.Error())
-			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
-			app.ServerError(w, err)
-			return
+		for _, snippet := range snippets {
+			fmt.Fprintf(w, "%+v\n", snippet)
 		}
+
+		// files := []string{
+		// 	"./ui/html/base.tmpl",
+		// 	"./ui/html/partials/nav.tmpl",
+		// 	"./ui/html/pages/home.tmpl",
+		// }
+
+		// ts, err := template.ParseFiles(files...)
+		// if err != nil {
+		// 	app.Errorlog.Println(err.Error())
+		// 	//http.Error(w, "Internal Server error", http.StatusInternalServerError)
+		// 	app.ServerError(w, err)
+		// 	return
+		// }
+
+		// err = ts.ExecuteTemplate(w, "base", nil)
+		// if err != nil {
+		// 	app.Errorlog.Println(err.Error())
+		// 	//http.Error(w, "Internal Server error", http.StatusInternalServerError)
+		// 	app.ServerError(w, err)
+		// 	return
+		// }
 	}
 }
 
@@ -65,6 +74,10 @@ func View(app *config.Application) http.HandlerFunc {
 			}
 		}
 
+		// 2023/10/26 yay, i made a functional product at last.
+		// Maybe this thing is not that hard after all
+
+		fmt.Fprintf(w, "Printing the snippet with the id: %v\n", id)
 		fmt.Fprintf(w, "%+v", snippet)
 	}
 }
