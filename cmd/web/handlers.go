@@ -55,6 +55,7 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
+		//fmt.Print(id)
 		snippet, err := app.Snippets.Get(id)
 		if err != nil {
 			if errors.Is(err, models.ErrNoRecord) {
