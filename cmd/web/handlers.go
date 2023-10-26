@@ -81,10 +81,11 @@ func Wcreate(app *config.Application) http.HandlerFunc {
 
 		id, err := app.Snippets.Insert(title, content, expires)
 		if err != nil {
+			fmt.Println("error here")
 			app.ServerError(w, err)
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/Snippet/View?id=%d", id), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/snippet/view?id=%d", id), http.StatusSeeOther)
 	}
 }

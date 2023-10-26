@@ -9,16 +9,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func Router() *mux.Router {
+// I need this function to get the routes of the http.ServeMux object.
+// It was funny, if you didn't use the configuration generated from the database
+// You cannot do the rest of the work.
+func Router(app *config.Application) *mux.Router {
 
 	r := mux.NewRouter()
 
 	fileserver := http.FileServer(http.Dir("./ui/static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver))
 
-	app := config.GetApp()
 	r.HandleFunc("/", Home(app))
 	r.HandleFunc("/snippet/view", View(app))
-	r.HandleFunc("/snippet/create", Wcreate(app))
+	r.HandleFunc("/snippet/create", Wcreate(app)).Methods(http.MethodPost)
 	return r
 }

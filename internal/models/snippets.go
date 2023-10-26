@@ -21,7 +21,7 @@ type Snippetmodel struct {
 func (m *Snippetmodel) Insert(title string, content string, expires int) (int, error) {
 	//Inserting the SQL statement
 	SQL_statement := `INSERT INTO snippets (title, content, created, expires)
-	VALUES(?,?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
+	VALUES(?,?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY));`
 
 	result, err := m.DB.Exec(SQL_statement, title, content, expires)
 	if err != nil {

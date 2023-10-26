@@ -25,7 +25,7 @@ func main() {
 	//	log.Fatal("error on http.ListenAndServe function, check the addr and mux variables.")
 	//}
 	srv := &http.Server{
-		Handler:      Router(),
+		Handler:      Router(app),
 		Addr:         *addr,
 		ErrorLog:     app.Errorlog,
 		WriteTimeout: 10 * time.Second,
