@@ -3,6 +3,7 @@ package templating
 import (
 	"html/template"
 	"path/filepath"
+	"time"
 
 	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
@@ -12,6 +13,14 @@ type TemplateData struct {
 	CurrentYear int
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+}
+
+func HumanReadableDate(t time.Time) string {
+	return t.Format("02 Jan 2006 at 15:04")
+}
+
+var functions = template.FuncMap{
+	"humandate": HumanReadableDate,
 }
 
 //Some caching for more bien pinche fast
@@ -30,7 +39,7 @@ func NewTemplateCache() (map[string]*template.Template, error) {
 
 		name := filepath.Base(page)
 
-		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		ts, err := template.New(name).Funcs(functions).ParseFiles("./ui/html/base.tmpl")
 		if err != nil {
 			loggers.ErrorLog().Print(err)
 			return nil, err
