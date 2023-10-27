@@ -12,7 +12,7 @@ import (
 // I need this function to get the routes of the http.ServeMux object.
 // It was funny, if you didn't use the configuration generated from the database
 // You cannot do the rest of the work.
-func Router(app *config.Application) *mux.Router {
+func Router(app *config.Application) http.Handler {
 
 	r := mux.NewRouter()
 
@@ -22,5 +22,5 @@ func Router(app *config.Application) *mux.Router {
 	r.HandleFunc("/", Home(app))
 	r.HandleFunc("/snippet/view", View(app))
 	r.HandleFunc("/snippet/create", Wcreate(app)).Methods(http.MethodPost)
-	return r
+	return app.LogRequest(config.SecureHeaders(r))
 }
