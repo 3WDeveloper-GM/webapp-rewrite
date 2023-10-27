@@ -10,16 +10,17 @@ import (
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
+	"github.com/gorilla/mux"
 )
 
 // this is handler for the home page, this just checks that the page relates to the "/"
 // I use the app *config.Application because it's easier for handling errors between packages
 func Home(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			app.NotFound(w)
-			return
-		}
+		// if r.URL.Path != "/" {
+		// 	app.NotFound(w)
+		// 	return
+		// }
 
 		snippets, err := app.Snippets.Latest()
 		if err != nil {
@@ -38,7 +39,10 @@ func Home(app *config.Application) http.HandlerFunc {
 // This is a webpage for vieeing some post results
 func View(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+
+		vars := mux.Vars(r)
+
+		id, err := strconv.Atoi(vars["id"])
 		if err != nil || id < 1 {
 			app.NotFound(w)
 			return
