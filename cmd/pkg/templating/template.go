@@ -9,8 +9,9 @@ import (
 )
 
 type TemplateData struct {
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CurrentYear int
+	Snippet     *models.Snippet
+	Snippets    []*models.Snippet
 }
 
 //Some caching for more bien pinche fast
@@ -29,14 +30,21 @@ func NewTemplateCache() (map[string]*template.Template, error) {
 
 		name := filepath.Base(page)
 
-		files := []string{
-			"./ui/html/base.tmpl",
-			"./ui/html/partials/nav.tmpl",
-			page,
+		ts, err := template.ParseFiles("./ui/html/base.tmpl")
+		if err != nil {
+			loggers.ErrorLog().Print(err)
+			return nil, err
 		}
 
-		ts, err := template.ParseFiles(files...)
+		ts, err = ts.ParseGlob("./ui/html/partials/*.tmpl")
 		if err != nil {
+			loggers.ErrorLog().Print(err)
+			return nil, err
+		}
+
+		ts, err = ts.ParseFiles(page)
+		if err != nil {
+			loggers.ErrorLog().Print(err)
 			return nil, err
 		}
 

@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 
@@ -28,10 +27,11 @@ func Home(app *config.Application) http.HandlerFunc {
 			return
 		}
 
+		data := app.CurrentYearTemplateData(r) //Template data that gets the current year
+		data.Snippets = snippets               //Getting the snippet data
+
 		// This method makes it so when i render a web page I just have to maintain the Render method.
-		app.Render(w, http.StatusOK, "home.tmpl", &templating.TemplateData{
-			Snippets: snippets,
-		})
+		app.Render(w, http.StatusOK, "home.tmpl", data)
 	}
 }
 
@@ -55,9 +55,10 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		app.Render(w, http.StatusOK, "view.tmpl", &templating.TemplateData{
-			Snippet: snippet,
-		})
+		data := app.CurrentYearTemplateData(r)
+		data.Snippet = snippet
+
+		app.Render(w, http.StatusOK, "view.tmpl", data)
 
 		// 2023/10/26 yay, i made a functional product at last.
 		// Maybe this thing is not that hard after all
