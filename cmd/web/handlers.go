@@ -5,11 +5,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 
@@ -22,37 +22,16 @@ func Home(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		// snippets, err := app.Snippets.Latest()
-		// if err != nil {
-		// 	app.ServerError(w, err)
-		// 	return
-		// }
-
-		// for _, snippet := range snippets {
-		// 	fmt.Fprintf(w, "%+v\n", snippet)
-		// }
-
-		files := []string{
-			"./ui/html/base.tmpl",
-			"./ui/html/partials/nav.tmpl",
-			"./ui/html/pages/home.tmpl",
-		}
-
-		ts, err := template.ParseFiles(files...)
+		snippets, err := app.Snippets.Latest()
 		if err != nil {
-			app.Errorlog.Println(err.Error())
-			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
 			app.ServerError(w, err)
 			return
 		}
 
-		err = ts.ExecuteTemplate(w, "base", nil)
-		if err != nil {
-			app.Errorlog.Println(err.Error())
-			//http.Error(w, "Internal Server error", http.StatusInternalServerError)
-			app.ServerError(w, err)
-			return
-		}
+		// This method makes it so when i render a web page I just have to maintain the Render method.
+		app.Render(w, http.StatusOK, "home.tmpl", &templating.TemplateData{
+			Snippets: snippets,
+		})
 	}
 }
 
@@ -76,26 +55,9 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		files := []string{
-			"./ui/html/base.tmpl",
-			"./ui/html/partials/nav.tmpl",
-			"./ui/html/pages/view.tmpl",
-		}
-
-		ts, err := template.ParseFiles(files...)
-		if err != nil {
-			app.ServerError(w, err)
-			return
-		}
-
-		data := &TemplateData{
+		app.Render(w, http.StatusOK, "view.tmpl", &templating.TemplateData{
 			Snippet: snippet,
-		}
-
-		err = ts.ExecuteTemplate(w, "base", data)
-		if err != nil {
-			app.ServerError(w, err)
-		}
+		})
 
 		// 2023/10/26 yay, i made a functional product at last.
 		// Maybe this thing is not that hard after all

@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
 )
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {
@@ -22,4 +24,20 @@ func (app *Application) ClientError(w http.ResponseWriter, status int) {
 
 func (app *Application) NotFound(w http.ResponseWriter) {
 	app.ClientError(w, http.StatusNotFound)
+}
+
+func (app *Application) Render(w http.ResponseWriter, status int, page string, data *templating.TemplateData) {
+	ts, ok := app.TemplateCache[page]
+	if !ok {
+		err := fmt.Errorf("the template %s does not exist", page)
+		app.ServerError(w, err)
+		return
+	}
+
+	w.WriteHeader(status)
+
+	err := ts.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		app.ServerError(w, err)
+	}
 }

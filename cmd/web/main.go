@@ -6,6 +6,8 @@ import (
 	"time"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
 )
 
 func main() {
@@ -16,7 +18,12 @@ func main() {
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL dsn")
 	flag.Parse()
 
-	app := config.ExportConfig(*dsn)
+	cache, err := templating.NewTemplateCache()
+	if err != nil {
+		loggers.ErrorLog().Fatal(err)
+	}
+
+	app := config.ExportConfig(*dsn, cache)
 
 	app.Infolog.Printf("Starting application on port %v \n", *addr) //Logging on start
 
