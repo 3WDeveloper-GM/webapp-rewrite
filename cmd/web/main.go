@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
+	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/loggers"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/templating"
 )
 
 func main() {

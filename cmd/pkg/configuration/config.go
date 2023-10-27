@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/database"
-	loggers "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/database"
+	loggers "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/loggers"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 

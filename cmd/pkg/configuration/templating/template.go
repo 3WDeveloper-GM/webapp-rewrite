@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/loggers"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/loggers"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 

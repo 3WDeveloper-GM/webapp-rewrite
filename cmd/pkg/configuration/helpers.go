@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/templating"
+	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/templating"
 )
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {

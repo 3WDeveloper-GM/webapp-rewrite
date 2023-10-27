@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
+	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 )
 

@@ -5,8 +5,9 @@ package main
 import (
 	"net/http"
 
-	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg"
+	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
 	"github.com/gorilla/mux"
+	"github.com/justinas/alice"
 )
 
 // I need this function to get the routes of the http.ServeMux object.
@@ -22,5 +23,9 @@ func Router(app *config.Application) http.Handler {
 	r.HandleFunc("/", Home(app))
 	r.HandleFunc("/snippet/view", View(app))
 	r.HandleFunc("/snippet/create", Wcreate(app)).Methods(http.MethodPost)
-	return app.LogRequest(config.SecureHeaders(r))
+
+	//Chaining some middleware
+	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)
+
+	return standard.Then(r)
 }
