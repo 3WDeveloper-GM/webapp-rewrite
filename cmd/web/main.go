@@ -12,10 +12,10 @@ import (
 
 func main() {
 
-	//setting the flags of the program, i can control the port and the database information, I'm using
+	//Setting the flags of the program, i can control the port and the database information, I'm using
 	//MariaDB as a database software right now.
 	addr := flag.String("addr", ":9090", "http network address: A number that defines the addr of our application")
-	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL dsn")
+	dsn := flag.String("dsn", "web:passwd1234@/snippetbox?parseTime=true", "MySQL dsn")
 	flag.Parse()
 
 	cache, err := templating.NewTemplateCache()

@@ -17,12 +17,16 @@ func Router(app *config.Application) http.Handler {
 
 	r := mux.NewRouter()
 
+	r.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.NotFound(w)
+	})
+
 	fileserver := http.FileServer(http.Dir("./ui/static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver)).Methods(http.MethodGet)
 
 	r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
 	r.HandleFunc("/snippet/view/{id:[0-9]+}", View(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", Wcreate(app)).Methods(http.MethodGet, http.MethodPost)
+	r.HandleFunc("/snippet/create", SnippetPosting(app)).Methods(http.MethodGet, http.MethodPost)
 
 	//Chaining some middleware
 	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)

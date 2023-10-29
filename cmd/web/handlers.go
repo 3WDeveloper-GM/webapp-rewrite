@@ -70,15 +70,19 @@ func View(app *config.Application) http.HandlerFunc {
 	}
 }
 
-func Wcreate(app *config.Application) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
 
-			w.Header().Set("Allow", http.MethodPost)
-			app.ClientError(w, http.StatusMethodNotAllowed)
-			//http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
+func SnippetCreate(app *config.Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := app.CurrentYearTemplateData(r)
+		app.Render(w, http.StatusOK, "create.tmpl", data)
+	}
+}
+
+func SnippetPosting(app *config.Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		// The SnippetPosting handler doesnt need to check whether the request is
+		// a POST or a GET this is done automatically by the gorilla/mux router
 
 		title := "O snail"
 		content :=
