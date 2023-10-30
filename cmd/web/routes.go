@@ -25,8 +25,9 @@ func Router(app *config.Application) http.Handler {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver)).Methods(http.MethodGet)
 
 	r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/view/{id:[0-9]+}", View(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", SnippetPosting(app)).Methods(http.MethodGet, http.MethodPost)
+	r.HandleFunc("/snippet/view/{id:[0-9]}", View(app)).Methods(http.MethodGet)
+	r.HandleFunc("/snippet/create", SnippetCreate(app)).Methods(http.MethodGet)
+	r.HandleFunc("/snippet/create", SnippetPosting(app)).Methods(http.MethodPost)
 
 	//Chaining some middleware
 	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)
