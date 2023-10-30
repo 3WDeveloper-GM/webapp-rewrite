@@ -5,11 +5,13 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
 
 	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/templating"
+	"github.com/go-playground/form/v4"
 )
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {
@@ -25,6 +27,24 @@ func (app *Application) ClientError(w http.ResponseWriter, status int) {
 
 func (app *Application) NotFound(w http.ResponseWriter) {
 	app.ClientError(w, http.StatusNotFound)
+}
+
+func (app *Application) DecodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	err = app.FormDecoder.Decode(dst, r.PostForm)
+	if err != nil {
+		var invalidDecoderError *form.InvalidDecoderError
+
+		if errors.As(err, &invalidDecoderError) {
+			panic(err)
+		}
+		return err
+	}
+	return nil
 }
 
 func (app *Application) Render(w http.ResponseWriter, status int, page string, data *templating.TemplateData) {

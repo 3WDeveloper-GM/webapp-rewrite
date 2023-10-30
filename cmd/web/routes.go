@@ -24,10 +24,19 @@ func Router(app *config.Application) http.Handler {
 	fileserver := http.FileServer(http.Dir("./ui/static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver)).Methods(http.MethodGet)
 
-	r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/view/{id}", View(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", SnippetCreate(app)).Methods(http.MethodGet)
-	r.HandleFunc("/snippet/create", SnippetPosting(app)).Methods(http.MethodPost)
+	dynamicmiddleware := alice.New(app.SessionManager.LoadAndSave)
+
+	//r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
+	//r.HandleFunc("/snippet/view/{id}", View(app)).Methods(http.MethodGet)
+	//r.HandleFunc("/snippet/create", SnippetCreate(app)).Methods(http.MethodGet)
+	//r.HandleFunc("/snippet/create", SnippetPosting(app)).Methods(http.MethodPost)
+
+	//Reworte these using the "gorilla/mux" way. Using the examples of the documentation
+	//as a base
+	r.Path("/").Handler(dynamicmiddleware.ThenFunc(Home(app))).Methods(http.MethodGet)
+	r.Path("/snippet/view/{id}").Handler(dynamicmiddleware.ThenFunc(View(app))).Methods(http.MethodGet)
+	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetCreate(app))).Methods(http.MethodGet)
+	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetPosting(app))).Methods(http.MethodPost)
 
 	//Chaining some middleware
 	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)

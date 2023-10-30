@@ -9,9 +9,17 @@ import (
 	"strconv"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
+	"github.com/3WDeveloper-GM/webapp-rewrite/internal"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
 	"github.com/gorilla/mux"
 )
+
+type SnippetPostingValidation struct {
+	Title              string `form:"title"`
+	Content            string `form:"content"`
+	Expires            int    `form:"expires"`
+	internal.Validator `form:"-"`
+}
 
 // this is handler for the home page, this just checks that the page relates to the "/"
 // I use the app *config.Application because it's easier for handling errors between packages
@@ -74,31 +82,47 @@ func SnippetCreate(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		data := app.CurrentYearTemplateData(r)
+
+		data.Form = &SnippetPostingValidation{
+			Expires: 365,
+		}
+
 		app.Render(w, http.StatusOK, "create.tmpl", data)
 	}
 }
 
 func SnippetPosting(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
+		var formdata SnippetPostingValidation
+
+		err := app.DecodePostForm(r, &formdata)
 		if err != nil {
 			app.ClientError(w, http.StatusBadRequest)
 			return
 		}
 
-		title := r.PostForm.Get("title")
-		content := r.PostForm.Get("content")
-		expires, err := strconv.Atoi(r.PostForm.Get("expires"))
-
+		err = app.FormDecoder.Decode(&formdata, r.PostForm)
 		if err != nil {
 			app.ClientError(w, http.StatusBadRequest)
+			return
+		}
+
+		formdata.CheckField(internal.NotBlank(formdata.Title), "title", "This field cannot be blank.")
+		formdata.CheckField(internal.MaxChars(formdata.Title, 100), "title", "This field cannot contain more than 100 characters.")
+		formdata.CheckField(internal.NotBlank(formdata.Content), "content", "This field cannot be blank")
+		formdata.CheckField(internal.PermittedInt(formdata.Expires, 1, 7, 365), "expires", "This field can only take values of 1, 7 or 365")
+
+		if !formdata.Valid() {
+			data := app.CurrentYearTemplateData(r)
+			data.Form = formdata
+			app.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 			return
 		}
 
 		// The SnippetPosting handler doesnt need to check whether the request is
 		// a POST or a GET this is done automatically by the gorilla/mux router
 
-		id, err := app.Snippets.Insert(title, content, expires)
+		id, err := app.Snippets.Insert(formdata.Title, formdata.Content, formdata.Expires)
 		if err != nil {
 			fmt.Println("error here")
 			app.ServerError(w, err)
