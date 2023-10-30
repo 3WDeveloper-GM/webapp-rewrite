@@ -67,12 +67,8 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		flash := app.SessionManager.PopString(r.Context(), "flash")
-
 		data := app.GetTemplateData(r)
 		data.Snippet = snippet
-
-		data.Flash = flash
 
 		app.Render(w, http.StatusOK, "view.tmpl", data)
 
@@ -138,3 +134,5 @@ func SnippetPosting(app *config.Application) http.HandlerFunc {
 		http.Redirect(w, r, fmt.Sprintf("/snippet/view/%v", id), http.StatusSeeOther)
 	}
 }
+
+//This is a change
