@@ -70,9 +70,9 @@ func View(app *config.Application) http.HandlerFunc {
 	}
 }
 
-
 func SnippetCreate(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		data := app.CurrentYearTemplateData(r)
 		app.Render(w, http.StatusOK, "create.tmpl", data)
 	}
@@ -80,20 +80,23 @@ func SnippetCreate(app *config.Application) http.HandlerFunc {
 
 func SnippetPosting(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			app.ClientError(w, http.StatusBadRequest)
+			return
+		}
+
+		title := r.PostForm.Get("title")
+		content := r.PostForm.Get("content")
+		expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+
+		if err != nil {
+			app.ClientError(w, http.StatusBadRequest)
+			return
+		}
 
 		// The SnippetPosting handler doesnt need to check whether the request is
 		// a POST or a GET this is done automatically by the gorilla/mux router
-
-		title := "O snail"
-		content :=
-			`
-		O snail
-		Climb Mount Fuji
-		Slowly, but SLowly!
-
-		- Kobayashi Issa
-		`
-		expires := 7
 
 		id, err := app.Snippets.Insert(title, content, expires)
 		if err != nil {
@@ -102,6 +105,6 @@ func SnippetPosting(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/snippet/view?id=%d", id), http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/snippet/view/%v", id), http.StatusSeeOther)
 	}
 }
