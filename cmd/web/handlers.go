@@ -36,8 +36,8 @@ func Home(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		data := app.CurrentYearTemplateData(r) //Template data that gets the current year
-		data.Snippets = snippets               //Getting the snippet data
+		data := app.GetTemplateData(r) //Template data that gets the current year
+		data.Snippets = snippets       //Getting the snippet data
 
 		// This method makes it so when i render a web page I just have to maintain the Render method.
 		app.Render(w, http.StatusOK, "home.tmpl", data)
@@ -67,8 +67,12 @@ func View(app *config.Application) http.HandlerFunc {
 			return
 		}
 
-		data := app.CurrentYearTemplateData(r)
+		flash := app.SessionManager.PopString(r.Context(), "flash")
+
+		data := app.GetTemplateData(r)
 		data.Snippet = snippet
+
+		data.Flash = flash
 
 		app.Render(w, http.StatusOK, "view.tmpl", data)
 
@@ -81,7 +85,7 @@ func View(app *config.Application) http.HandlerFunc {
 func SnippetCreate(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		data := app.CurrentYearTemplateData(r)
+		data := app.GetTemplateData(r)
 
 		data.Form = &SnippetPostingValidation{
 			Expires: 365,
@@ -113,7 +117,7 @@ func SnippetPosting(app *config.Application) http.HandlerFunc {
 		formdata.CheckField(internal.PermittedInt(formdata.Expires, 1, 7, 365), "expires", "This field can only take values of 1, 7 or 365")
 
 		if !formdata.Valid() {
-			data := app.CurrentYearTemplateData(r)
+			data := app.GetTemplateData(r)
 			data.Form = formdata
 			app.Render(w, http.StatusUnprocessableEntity, "create.tmpl", data)
 			return
@@ -128,6 +132,8 @@ func SnippetPosting(app *config.Application) http.HandlerFunc {
 			app.ServerError(w, err)
 			return
 		}
+
+		app.SessionManager.Put(r.Context(), "flash", "Snippet Succesfully Created")
 
 		http.Redirect(w, r, fmt.Sprintf("/snippet/view/%v", id), http.StatusSeeOther)
 	}

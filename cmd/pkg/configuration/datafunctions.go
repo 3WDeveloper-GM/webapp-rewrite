@@ -7,8 +7,10 @@ import (
 	"github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration/templating"
 )
 
-func (app *Application) CurrentYearTemplateData(r *http.Request) *templating.TemplateData {
+func (app *Application) GetTemplateData(r *http.Request) *templating.TemplateData {
 	return &templating.TemplateData{
 		CurrentYear: time.Now().Year(),
+
+		Flash: app.SessionManager.PopString(r.Context(), "flash"),
 	}
 }
