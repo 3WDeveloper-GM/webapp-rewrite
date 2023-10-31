@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
@@ -10,81 +9,78 @@ import (
 	validator "github.com/3WDeveloper-GM/webapp-rewrite/internal/validator"
 )
 
-type userSignupForm struct {
-	Name     string `form:"name"`
+type userLoginForm struct {
 	Email    string `form:"email"`
 	Password string `form:"password"`
 	validator.Validator
 }
 
-func userSignup(app *config.Application) http.HandlerFunc {
+func userLogin(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data := app.GetTemplateData(r)
-		data.Form = userSignupForm{}
-		app.Render(w, http.StatusOK, "signup.tmpl", data)
+		data.Form = userLoginForm{}
+		app.Render(w, http.StatusOK, "login.tmpl", data)
 	}
 }
 
-func userSignupPost(app *config.Application) http.HandlerFunc {
+func userLogoutPost(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var formdata userSignupForm
+		err := app.SessionManager.RenewToken(r.Context())
+		if err != nil {
+			app.ServerError(w, err)
+		}
+
+		app.SessionManager.Remove(r.Context(), "authenticatedUserID")
+
+		app.SessionManager.Put(r.Context(), "flash", "You've logged out succesfully")
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+func userLoginPost(app *config.Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var formdata userLoginForm
 
 		err := app.DecodePostForm(r, &formdata)
 		if err != nil {
 			app.ClientError(w, http.StatusBadRequest)
-			return
 		}
 
-		//Form validation, I start to notice the pattern.
-		formdata.CheckField(validator.NotBlank(formdata.Name), "name", "Field cannot be blank")
-		formdata.CheckField(validator.NotBlank(formdata.Email), "email", "Field cannot be blank")
-		formdata.CheckField(validator.Matches(formdata.Email, validator.EmailRX), "email", "this field must be a valid email address")
-		formdata.CheckField(validator.MinChars(formdata.Password, 8), "password", "This field cannot be less than 8 characters")
-		formdata.CheckField(validator.NotBlank(formdata.Password), "password", "field cannot be blank")
-		formdata.CheckField(validator.MaxChars(formdata.Password, 30), "password", "Field cannot be more than 30 characters.")
+		formdata.CheckField(validator.NotBlank(formdata.Email), "email", "This field cannot be blank")
+		formdata.CheckField(validator.Matches(formdata.Email, validator.EmailRX), "email", "This must be a valid email address")
+		formdata.CheckField(validator.NotBlank(formdata.Password), "password", "This field cannot be blank")
 
 		if !formdata.Valid() {
 			data := app.GetTemplateData(r)
 			data.Form = formdata
-			app.Render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
+			app.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
 			return
 		}
 
-		err = app.Users.Insert(formdata.Name, formdata.Email, formdata.Password)
+		id, err := app.Users.Authenticate(formdata.Email, formdata.Password)
 		if err != nil {
-			if errors.Is(err, models.ErrDuplicateEmail) {
-				formdata.AddFieldError("email", "email address already in use")
+			if errors.Is(err, models.ErrInvalidCredentials) {
+				formdata.AddNonfieldError("Email or password is incorrect")
 
 				data := app.GetTemplateData(r)
 				data.Form = formdata
-				app.Render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
-				return
+				app.Render(w, http.StatusUnprocessableEntity, "login.tmpl", data)
 			} else {
 				app.ServerError(w, err)
 			}
 			return
 		}
 
-		app.SessionManager.Put(r.Context(), "flash", "Your signup was successful, please log in")
+		err = app.SessionManager.RenewToken(r.Context())
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
 
-		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
-	}
-}
+		app.SessionManager.Put(r.Context(), "authenticatedUserID", id)
 
-func userLogin(app *config.Application) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Some web form for login")
-	}
-}
-
-func userLoginPost(app *config.Application) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Some method for login, limited to posting")
-	}
-}
-
-func userLogoutPost(app *config.Application) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "some method for logout, limited to post")
+		http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
 	}
 }

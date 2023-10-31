@@ -9,8 +9,8 @@ import (
 
 func (app *Application) GetTemplateData(r *http.Request) *templating.TemplateData {
 	return &templating.TemplateData{
-		CurrentYear: time.Now().Year(),
-
-		Flash: app.SessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.SessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.IsAuthenticated(r),
 	}
 }
