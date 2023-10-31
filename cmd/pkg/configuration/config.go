@@ -21,6 +21,7 @@ type Application struct {
 	Infolog        *log.Logger
 	Errorlog       *log.Logger
 	Snippets       *models.Snippetmodel
+	Users          *models.UserModel
 	TemplateCache  map[string]*template.Template
 	FormDecoder    *form.Decoder
 	SessionManager *scs.SessionManager
@@ -54,6 +55,20 @@ func sessionManager(db *sql.DB) *scs.SessionManager {
 	return sman
 }
 
+func loginsAndUsers(db *sql.DB) *models.UserModel {
+	return &models.UserModel{
+		DB: db,
+	}
+}
+
+// This just makes the snippetModelData I think that making a function is good to add newer
+// functions later
+func snippetsmodelData(db *sql.DB) *models.Snippetmodel {
+	return &models.Snippetmodel{
+		DB: db,
+	}
+}
+
 // Establishes the preferences for the elliptic curves used by the app, the book says
 // that this curves are good enough to get security and still have acceptable performance.
 func tlsConfig() *tls.Config {
@@ -76,7 +91,8 @@ func ExportConfig(dsn string, templates map[string]*template.Template) *Applicat
 	app := &Application{
 		Infolog:        loggers.Infolog(),
 		Errorlog:       loggers.ErrorLog(),
-		Snippets:       &models.Snippetmodel{DB: db},
+		Snippets:       snippetsmodelData(db),
+		Users:          loginsAndUsers(db),
 		TemplateCache:  templates,
 		FormDecoder:    formDecoder,
 		SessionManager: appSessionManager,

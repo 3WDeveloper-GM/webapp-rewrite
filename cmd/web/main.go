@@ -36,9 +36,9 @@ func main() {
 		Addr:     *addr,
 		ErrorLog: app.Errorlog,
 
-		WriteTimeout: 5 * time.Second,
-		ReadTimeout:  10 * time.Second,
-		IdleTimeout:  1 * time.Minute,
+		WriteTimeout: 5 * time.Second,  //Prevents the handler data from taking too long to write.
+		ReadTimeout:  10 * time.Second, //This one prevents slow client attacks
+		IdleTimeout:  1 * time.Minute,  //This one is purely done for the server performance (i/e closing conections) when the user logs out due to unexpected events.
 
 		TLSConfig: app.TLSconfig,
 	}

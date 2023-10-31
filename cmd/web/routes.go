@@ -33,10 +33,19 @@ func Router(app *config.Application) http.Handler {
 
 	//Reworte these using the "gorilla/mux" way. Using the examples of the documentation
 	//as a base
+
+	// This are the routes i will use for navigating the webpage
 	r.Path("/").Handler(dynamicmiddleware.ThenFunc(Home(app))).Methods(http.MethodGet)
 	r.Path("/snippet/view/{id}").Handler(dynamicmiddleware.ThenFunc(View(app))).Methods(http.MethodGet)
 	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetCreate(app))).Methods(http.MethodGet)
 	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetPosting(app))).Methods(http.MethodPost)
+
+	// This are the routes I'll use for the authentication part
+	r.Path("/users/signup").Handler(dynamicmiddleware.Then(userSignup(app))).Methods(http.MethodGet)
+	r.Path("/users/signup").Handler(dynamicmiddleware.Then(userSignupPost(app))).Methods(http.MethodPost)
+	r.Path("/users/login").Handler(dynamicmiddleware.Then(userLogin(app))).Methods(http.MethodGet)
+	r.Path("/users/login").Handler(dynamicmiddleware.Then(userLoginPost(app))).Methods(http.MethodPost)
+	r.Path("/users/logout").Handler(dynamicmiddleware.Then(userLogoutPost(app))).Methods(http.MethodPost)
 
 	//Chaining some middleware
 	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)
