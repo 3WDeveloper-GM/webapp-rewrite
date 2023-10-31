@@ -23,6 +23,7 @@ func main() {
 		loggers.ErrorLog().Fatal(err)
 	}
 
+	// This just fetches the configurations at compile time. It is useful for getting the flags and cache running and ready,
 	app := config.ExportConfig(*dsn, cache)
 
 	app.Infolog.Printf("Starting application on port %v \n", *addr) //Logging on start
