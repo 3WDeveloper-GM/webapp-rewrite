@@ -38,5 +38,5 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
-	app.Errorlog.Fatal(srv.ListenAndServe())
+	app.Errorlog.Fatal(srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }

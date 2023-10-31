@@ -1,6 +1,7 @@
 package config
 
 import (
+	"database/sql"
 	"html/template"
 	"log"
 	"time"
@@ -28,20 +29,38 @@ func GetApp() *Application {
 	return &Application{}
 }
 
-func ExportConfig(dsn string, templates map[string]*template.Template) *Application {
-
-	// Database configuration at compile time
+// This function initalizes a database configuration, I do the error handling
+// "inside" of the function, I don't really care for the error in the case the
+// function works, so at the compile time, the ExportConfig function just uses
+// the first value of databaseConfig.
+func databaseConfig(dsn string) (*sql.DB, error){
 	db, err := database.OpenDB(dsn)
 	if err != nil {
 		loggers.ErrorLog().Fatal(err)
+		return nil, err
 	}
+	return db, nil
+}
+
+// This little function just initializes a *scs.SessionManager object to be
+// used by the database and the application. It just saves me the effort to
+// change some things in the session manager if i need.
+func sessionManager(db *sql.DB) (*scs.SessionManager) {
+	sman := scs.New()
+	sman.Store = mysqlstore.New(db)
+	sman.Lifetime = 12 * time.Hour
+	return sman
+}
+
+func ExportConfig(dsn string, templates map[string]*template.Template) *Application {
+
+	// Database configuration at compile time
+	db, _ := databaseConfig(dsn)
 
 	//Form decoder configuration
 	formDecoder := form.NewDecoder()
 
-	sman := scs.New()
-	sman.Store = mysqlstore.New(db)
-	sman.Lifetime = 12 * time.Hour
+	appSessionManager := sessionManager(db)
 
 	//Generates an application object that is exported to the main function
 	app := &Application{
@@ -50,7 +69,7 @@ func ExportConfig(dsn string, templates map[string]*template.Template) *Applicat
 		Snippets:       &models.Snippetmodel{DB: db},
 		TemplateCache:  templates,
 		FormDecoder:    formDecoder,
-		SessionManager: sman,
+		SessionManager: appSessionManager,
 	}
 	return app
 }
