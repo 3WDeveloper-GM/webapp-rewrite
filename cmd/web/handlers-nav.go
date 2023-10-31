@@ -9,8 +9,8 @@ import (
 	"strconv"
 
 	config "github.com/3WDeveloper-GM/webapp-rewrite/cmd/pkg/configuration"
-	"github.com/3WDeveloper-GM/webapp-rewrite/internal"
 	"github.com/3WDeveloper-GM/webapp-rewrite/internal/models"
+	internal "github.com/3WDeveloper-GM/webapp-rewrite/internal/validator"
 	"github.com/gorilla/mux"
 )
 
