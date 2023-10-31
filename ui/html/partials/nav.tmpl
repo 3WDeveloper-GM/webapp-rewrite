@@ -1,18 +1,19 @@
 {{define "nav"}}
    <nav>
-      {{ if .IsAuthenticated}}
-         
-      {{ end }}
       <div>
          <a href='/'>Home</a>
+         {{if .IsAuthenticated}}
          <a href='/snippet/create'>Create Snippet</a>
+         {{end}}
       </div>
       <div>
          <a href="/users/login">Login</a>
          <a href="/users/signup">Sign up</a>
+         {{if .IsAuthenticated}}
          <form action="/users/logout", method="POST">
             <button>Logout</button>
          </form>
+         {{end}}
       </div>
    </nav>
 {{end}}

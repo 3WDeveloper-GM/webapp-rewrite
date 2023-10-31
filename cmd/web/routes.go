@@ -26,6 +26,8 @@ func Router(app *config.Application) http.Handler {
 
 	dynamicmiddleware := alice.New(app.SessionManager.LoadAndSave)
 
+	protectedmiddleware := dynamicmiddleware.Append(app.RequireAuthentication)
+
 	//r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
 	//r.HandleFunc("/snippet/view/{id}", View(app)).Methods(http.MethodGet)
 	//r.HandleFunc("/snippet/create", SnippetCreate(app)).Methods(http.MethodGet)
@@ -37,15 +39,15 @@ func Router(app *config.Application) http.Handler {
 	// This are the routes i will use for navigating the webpage
 	r.Path("/").Handler(dynamicmiddleware.ThenFunc(Home(app))).Methods(http.MethodGet)
 	r.Path("/snippet/view/{id}").Handler(dynamicmiddleware.ThenFunc(View(app))).Methods(http.MethodGet)
-	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetCreate(app))).Methods(http.MethodGet)
-	r.Path("/snippet/create").Handler(dynamicmiddleware.ThenFunc(SnippetPosting(app))).Methods(http.MethodPost)
-
+	r.Path("/users/signup").Handler(dynamicmiddleware.ThenFunc(userSignup(app))).Methods(http.MethodGet)
+	r.Path("/users/signup").Handler(dynamicmiddleware.ThenFunc(userSignupPost(app))).Methods(http.MethodPost)
+	r.Path("/users/login").Handler(dynamicmiddleware.ThenFunc(userLogin(app))).Methods(http.MethodGet)
+	r.Path("/users/login").Handler(dynamicmiddleware.ThenFunc(userLoginPost(app))).Methods(http.MethodPost)
 	// This are the routes I'll use for the authentication part
-	r.Path("/users/signup").Handler(dynamicmiddleware.Then(userSignup(app))).Methods(http.MethodGet)
-	r.Path("/users/signup").Handler(dynamicmiddleware.Then(userSignupPost(app))).Methods(http.MethodPost)
-	r.Path("/users/login").Handler(dynamicmiddleware.Then(userLogin(app))).Methods(http.MethodGet)
-	r.Path("/users/login").Handler(dynamicmiddleware.Then(userLoginPost(app))).Methods(http.MethodPost)
-	r.Path("/users/logout").Handler(dynamicmiddleware.Then(userLogoutPost(app))).Methods(http.MethodPost)
+
+	r.Path("/users/logout").Handler(protectedmiddleware.ThenFunc(userLogoutPost(app))).Methods(http.MethodPost)
+	r.Path("/snippet/create").Handler(protectedmiddleware.ThenFunc(SnippetCreate(app))).Methods(http.MethodGet)
+	r.Path("/snippet/create").Handler(protectedmiddleware.ThenFunc(SnippetPosting(app))).Methods(http.MethodPost)
 
 	//Chaining some middleware
 	standard := alice.New(app.RecoverPanic, app.LogRequest, config.SecureHeaders)
