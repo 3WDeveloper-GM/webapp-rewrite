@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"html/template"
 	"log"
@@ -23,6 +24,7 @@ type Application struct {
 	TemplateCache  map[string]*template.Template
 	FormDecoder    *form.Decoder
 	SessionManager *scs.SessionManager
+	TLSconfig      *tls.Config
 }
 
 func GetApp() *Application {
@@ -33,7 +35,7 @@ func GetApp() *Application {
 // "inside" of the function, I don't really care for the error in the case the
 // function works, so at the compile time, the ExportConfig function just uses
 // the first value of databaseConfig.
-func databaseConfig(dsn string) (*sql.DB, error){
+func databaseConfig(dsn string) (*sql.DB, error) {
 	db, err := database.OpenDB(dsn)
 	if err != nil {
 		loggers.ErrorLog().Fatal(err)
@@ -45,11 +47,19 @@ func databaseConfig(dsn string) (*sql.DB, error){
 // This little function just initializes a *scs.SessionManager object to be
 // used by the database and the application. It just saves me the effort to
 // change some things in the session manager if i need.
-func sessionManager(db *sql.DB) (*scs.SessionManager) {
+func sessionManager(db *sql.DB) *scs.SessionManager {
 	sman := scs.New()
 	sman.Store = mysqlstore.New(db)
 	sman.Lifetime = 12 * time.Hour
 	return sman
+}
+
+// Establishes the preferences for the elliptic curves used by the app, the book says
+// that this curves are good enough to get security and still have acceptable performance.
+func tlsConfig() *tls.Config {
+	return &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.CurveP256, tls.X25519},
+	}
 }
 
 func ExportConfig(dsn string, templates map[string]*template.Template) *Application {
@@ -70,6 +80,7 @@ func ExportConfig(dsn string, templates map[string]*template.Template) *Applicat
 		TemplateCache:  templates,
 		FormDecoder:    formDecoder,
 		SessionManager: appSessionManager,
+		TLSconfig:      tlsConfig(),
 	}
 	return app
 }

@@ -32,11 +32,15 @@ func main() {
 	//	log.Fatal("error on http.ListenAndServe function, check the addr and mux variables.")
 	//}
 	srv := &http.Server{
-		Handler:      Router(app),
-		Addr:         *addr,
-		ErrorLog:     app.Errorlog,
-		WriteTimeout: 10 * time.Second,
+		Handler:  Router(app),
+		Addr:     *addr,
+		ErrorLog: app.Errorlog,
+
+		WriteTimeout: 5 * time.Second,
 		ReadTimeout:  10 * time.Second,
+		IdleTimeout:  1 * time.Minute,
+
+		TLSConfig: app.TLSconfig,
 	}
 	app.Errorlog.Fatal(srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }
