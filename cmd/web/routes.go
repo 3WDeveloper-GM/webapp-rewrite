@@ -24,7 +24,7 @@ func Router(app *config.Application) http.Handler {
 	fileserver := http.FileServer(http.Dir("./ui/static/"))
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileserver)).Methods(http.MethodGet)
 
-	dynamicmiddleware := alice.New(app.SessionManager.LoadAndSave, app.CSRFProtectionToken)
+	dynamicmiddleware := alice.New(app.SessionManager.LoadAndSave, app.CSRFProtectionToken, app.Authenticate)
 
 	protectedmiddleware := dynamicmiddleware.Append(app.RequireAuthentication)
 	//r.HandleFunc("/", Home(app)).Methods(http.MethodGet)
