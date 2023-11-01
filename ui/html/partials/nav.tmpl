@@ -11,6 +11,7 @@
          <a href="/users/signup">Sign up</a>
          {{if .IsAuthenticated}}
          <form action="/users/logout", method="POST">
+            <input type="hidden" name="crsf_token" value="{{.CRSFToken}}">
             <button>Logout</button>
          </form>
          {{end}}

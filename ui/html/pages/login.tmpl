@@ -4,6 +4,7 @@
 
 {{ define "main" }}
    <form action="/users/login" method="POST" novalidate>
+      <input type="hidden" name="crsf_token" value="{{.CRSFToken}}">
       {{ range .Form.NonFieldErrors }}
         <div class="error">{{.}}</div> 
       {{ end }}
