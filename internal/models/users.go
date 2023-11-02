@@ -80,11 +80,11 @@ func (m *UserModel) Exists(id int) (bool, error) {
 }
 
 func (m *UserModel) Get(id int) (*Users, error) {
-	var UserData *Users
+	var UserData Users
 
-	SQL_STATEMENT := `SELECT name, email, created FROM users WHERE id =?;`
+	SQL_STATEMENT := `SELECT id, name, email, created FROM users WHERE id =?;`
 
-	err := m.DB.QueryRow(SQL_STATEMENT, id).Scan(&UserData.Name, &UserData.Email, &UserData.Created)
+	err := m.DB.QueryRow(SQL_STATEMENT, id).Scan(&UserData.ID, &UserData.Name, &UserData.Email, &UserData.Created)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -92,5 +92,5 @@ func (m *UserModel) Get(id int) (*Users, error) {
 			return nil, err
 		}
 	}
-	return UserData, err
+	return &UserData, err
 }

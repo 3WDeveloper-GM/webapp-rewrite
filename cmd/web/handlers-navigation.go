@@ -155,8 +155,10 @@ func AccountView(app *config.Application) http.HandlerFunc {
 			}
 		}
 
-		fmt.Fprintf(w, "+%v", user)
+		data := app.GetTemplateData(r)
+		data.Userdata = user
 
+		app.Render(w, http.StatusOK, "account.tmpl", data)
 	}
 }
 
