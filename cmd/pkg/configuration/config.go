@@ -26,6 +26,7 @@ type Application struct {
 	FormDecoder    *form.Decoder
 	SessionManager *scs.SessionManager
 	TLSconfig      *tls.Config
+	DebugMode      bool
 }
 
 func GetApp() *Application {
@@ -77,7 +78,7 @@ func tlsConfig() *tls.Config {
 	}
 }
 
-func ExportConfig(dsn string, templates map[string]*template.Template) *Application {
+func ExportConfig(dsn string, debugmode bool, templates map[string]*template.Template) *Application {
 
 	// Database configuration at compile time
 	db, _ := databaseConfig(dsn)
@@ -97,6 +98,7 @@ func ExportConfig(dsn string, templates map[string]*template.Template) *Applicat
 		FormDecoder:    formDecoder,
 		SessionManager: appSessionManager,
 		TLSconfig:      tlsConfig(),
+		DebugMode:      debugmode,
 	}
 	return app
 }

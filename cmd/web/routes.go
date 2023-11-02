@@ -42,8 +42,10 @@ func Router(app *config.Application) http.Handler {
 	r.Path("/users/signup").Handler(dynamicmiddleware.ThenFunc(userSignupPost(app))).Methods(http.MethodPost)
 	r.Path("/users/login").Handler(dynamicmiddleware.ThenFunc(userLogin(app))).Methods(http.MethodGet)
 	r.Path("/users/login").Handler(dynamicmiddleware.ThenFunc(userLoginPost(app))).Methods(http.MethodPost)
+	r.Path("/about").Handler(dynamicmiddleware.Then(About(app))).Methods(http.MethodGet)
 	// This are the routes I'll use for the authentication part
 
+	r.Path("/account/view").Handler(protectedmiddleware.Then(AccountView(app))).Methods(http.MethodGet)
 	r.Path("/users/logout").Handler(protectedmiddleware.ThenFunc(userLogoutPost(app))).Methods(http.MethodPost)
 	r.Path("/snippet/create").Handler(protectedmiddleware.ThenFunc(SnippetCreate(app))).Methods(http.MethodGet)
 	r.Path("/snippet/create").Handler(protectedmiddleware.ThenFunc(SnippetPosting(app))).Methods(http.MethodPost)

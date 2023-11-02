@@ -6,6 +6,10 @@
     font-family: "Ubuntu Mono", monospace;
 }
 
+blockquote {
+    margin-left: 30px;
+}
+
 html, body {
     height: 100%;
 }

@@ -16,6 +16,7 @@ func main() {
 	//MariaDB as a database software right now.
 	addr := flag.String("addr", ":9090", "http network address: A number that defines the addr of our application")
 	dsn := flag.String("dsn", "web:passwd1234@/snippetbox?parseTime=true", "MySQL dsn")
+	debug := flag.Bool("debug", false, "Set to true to activate the debug mode")
 	flag.Parse()
 
 	cache, err := templating.NewTemplateCache()
@@ -24,7 +25,7 @@ func main() {
 	}
 
 	// This just fetches the configurations at compile time. It is useful for getting the flags and cache running and ready,
-	app := config.ExportConfig(*dsn, cache)
+	app := config.ExportConfig(*dsn, *debug, cache)
 
 	app.Infolog.Printf("Starting application on port %v \n", *addr) //Logging on start
 

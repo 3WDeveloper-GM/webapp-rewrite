@@ -44,6 +44,13 @@ func Home(app *config.Application) http.HandlerFunc {
 	}
 }
 
+func About(app *config.Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := app.GetTemplateData(r)
+		app.Render(w, http.StatusOK, "about.tmpl", data)
+	}
+}
+
 // This is a webpage for vieeing some post results
 func View(app *config.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -132,6 +139,24 @@ func SnippetPosting(app *config.Application) http.HandlerFunc {
 		app.SessionManager.Put(r.Context(), "flash", "Snippet Succesfully Created")
 
 		http.Redirect(w, r, fmt.Sprintf("/snippet/view/%v", id), http.StatusSeeOther)
+	}
+}
+
+func AccountView(app *config.Application) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := app.SessionManager.GetInt(r.Context(), "authenticatedUserID")
+
+		user, err := app.Users.Get(userID)
+		if err != nil {
+			if errors.Is(err, models.ErrNoRecord) {
+				http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+			} else {
+				app.ServerError(w, err)
+			}
+		}
+
+		fmt.Fprintf(w, "+%v", user)
+
 	}
 }
 
