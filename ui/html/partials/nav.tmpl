@@ -8,14 +8,15 @@
          {{end}}
       </div>
       <div>
-         <a href="/users/login">Login</a>
-         <a href="/users/signup">Sign up</a>
          {{if .IsAuthenticated}}
          <a href="/account/view">Account</a>
          <form action="/users/logout", method="POST">
             <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
             <button>Logout</button>
          </form>
+         {{else}}
+            <a href="/users/login">Login</a>
+            <a href="/users/signup">Sign up</a>
          {{end}}
       </div>
    </nav>

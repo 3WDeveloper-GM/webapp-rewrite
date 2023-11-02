@@ -1,20 +1,24 @@
 {{define "title"}}Your Account{{end}}
 {{define "main"}}
-<h2>Your Account</h2>
-{{with .Userdata}}
-<table>
-<tr>
-<th>Name</th>
-<td>{{.Name}}</td>
-</tr>
-<tr>
-<th>Email</th>
-<td>{{.Email}}</td>
-</tr>
-<tr>
-<th>Joined</th>
-<td>{{humandate .Created}}</td>
-</tr>
-</table>
+   <h2>Your Account</h2>
+   {{with .Userdata}}
+   <table>
+      <tr>
+         <th>Name</th>
+         <td>{{.Name}}</td>
+      </tr>
+      <tr>
+         <th>Email</th>
+         <td>{{.Email}}</td>
+      </tr>
+      <tr>
+         <th>Joined</th>
+         <td>{{humandate .Created}}</td>
+      </tr>
+      <tr>
+         <th>Password</th>
+         <td><a href="/account/update">Change Password</a></td>
+      </tr>
+   </table>
 {{end }}
 {{end}}

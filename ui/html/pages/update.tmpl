@@ -7,27 +7,27 @@
    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
    <div>
       <label>Current Password:</label>
-      {{with .Form.FieldErrors.newpassword}}
+      {{with .Form.FieldErrors.currentPassword}}
          <label class="error">{{.}}</label>
       {{end}}
-         <input type="password" name="password">
+         <input type="password" name="currentPassword">
    </div>
    <div>
       <label>New Password:</label>
-      {{with .Form.FieldErrors.newpassword}}
+      {{with .Form.FieldErrors.newPassword}}
          <label class="error">{{.}}</label>
       {{end}}
-         <input type="password" name="password">
+         <input type="password" name="newPassword">
    </div>
    <div>
       <label>Type the New Password again:</label>
-      {{with .Form.FieldErrors.newpassword}}
+      {{with .Form.FieldErrors.newPasswordValidator}}
          <label class="error">{{.}}</label>
       {{end}}
-         <input type="password" name="password">
+         <input type="password" name="newPasswordValidator">
    </div>
    <div>
-      <input type="submit" value="Signup">
+      <input type="submit" value="Change Password">
    </div>
 </form>
 {{ end }}
