@@ -1,0 +1,33 @@
+{{ define "title" }}
+   Update Password
+{{ end }}
+
+{{ define "main" }}
+<form action="/account/update" method="POST" novalidate>
+   <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+   <div>
+      <label>Current Password:</label>
+      {{with .Form.FieldErrors.newpassword}}
+         <label class="error">{{.}}</label>
+      {{end}}
+         <input type="password" name="password">
+   </div>
+   <div>
+      <label>New Password:</label>
+      {{with .Form.FieldErrors.newpassword}}
+         <label class="error">{{.}}</label>
+      {{end}}
+         <input type="password" name="password">
+   </div>
+   <div>
+      <label>Type the New Password again:</label>
+      {{with .Form.FieldErrors.newpassword}}
+         <label class="error">{{.}}</label>
+      {{end}}
+         <input type="password" name="password">
+   </div>
+   <div>
+      <input type="submit" value="Signup">
+   </div>
+</form>
+{{ end }}

@@ -62,3 +62,7 @@ func MinChars(value string, n int) bool {
 func Matches(value string, rx *regexp.Regexp) bool {
 	return rx.MatchString(value)
 }
+
+func PasswordMatching(pass_1, pass_2 string) bool {
+	return pass_1 == pass_2
+}
